@@ -7,8 +7,8 @@ import sys
 from prophet import Prophet
 
 # Recebe como parametro a quantidade de meses
-# months = sys.argv[1]
-months = 8
+months = sys.argv[1]
+# months = 8
 
 # Configurações de display de dataFrames
 # pd.set_option('display.max_columns', None)
