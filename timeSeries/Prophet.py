@@ -2,11 +2,13 @@ import numpy as np
 import pandas as pd
 import datetime as dt
 import matplotlib.pyplot as plt
+import dateutil.relativedelta as rdt
 import sys
 from prophet import Prophet
 
 # Recebe como parametro a quantidade de meses
-months = sys.argv[1]
+# months = sys.argv[1]
+months = 8
 
 # Configurações de display de dataFrames
 # pd.set_option('display.max_columns', None)
@@ -97,15 +99,19 @@ allData = pd.merge(allData, dataBurned, on = 'ds', how = 'left')
 # Convertendo o campo ds para DateTime
 allData['ds'] = pd.to_datetime(allData['ds']) 
 
-print(allData)
+#print(allData)
 
 # Definindo dados para treino e teste
 # dataSize = int(len(allData) * 0.8)
 # dataTrain = allData[:dataSize]
 # dataTest  = allData[dataSize:]
 
-print(allData)
-print(dataBurned)
+#print(allData)
+#print(dataBurned)
+
+actualDate = pd.to_datetime('2020-01-01', format = '%Y-%m-%d')
+
+calcDate = actualDate + rdt.relativedelta(months = int(months))
 
 dataTrain = allData.loc[
     # (allData['ds'] >= pd.to_datetime('2010-01-01', format = '%Y-%m-%d'))
@@ -116,13 +122,7 @@ dataTrain = allData.loc[
 dataTest = allData.loc[
     (allData['ds'] >= pd.to_datetime('2020-01-01', format = '%Y-%m-%d'))
     &
-    (allData['ds'] <= pd.to_datetime('2020-12-30', format = '%Y-%m-%d'))
-].copy()
-
-dataReal = allData.loc[
-    (allData['ds'] >= pd.to_datetime('2020-01-01', format = '%Y-%m-%d'))
-    &
-    (allData['ds'] <= pd.to_datetime('2020-12-30', format = '%Y-%m-%d'))
+    (allData['ds'] <= calcDate)
 ].copy()
 
 
@@ -186,9 +186,7 @@ forecast = model.predict(future)
 
 # Plota o gráfico com os dados históricos e as previsões futuras
 model.plot(forecast, xlabel = 'Data', ylabel = 'Preço')
-plt.plot(dataTest['ds'], dataTest['y'], 'r', label='Dados de teste')
-plt.plot(dataReal['ds'], dataReal['y'], 'g', label='Dados de teste')
+plt.plot(dataTest['ds'], dataTest['y'], 'r', label='Dados Reais')
 plt.legend()
 plt.title(f"Estimativa do preço do trigo para {months} meses")
 plt.show()
-
